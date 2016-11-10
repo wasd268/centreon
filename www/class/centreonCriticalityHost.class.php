@@ -38,19 +38,19 @@
  *
  * @author Sylvestre Ho
  */
-class CentreonCriticality
+class CentreonCriticalityHost
 {
     /**
      * @var CentreonDB
      */
     protected $db;
     protected $tree;
-    
+
     public function __construct($db)
     {
         $this->db = $db;
     }
-    
+
     /**
      * Get data of a criticality object
      *
@@ -71,71 +71,6 @@ class CentreonCriticality
      * @return array
      */
 
-
-//    /* Prepare options table */
-//$action = $this->arguments['action'];
-//
-//$options = array();
-//if (isset($this->arguments['object'])) {
-//$options['o'] = $this->arguments['object'];
-//}
-//
-//if (isset($this->arguments['values'])) {
-//    if (is_array($this->arguments['values'])) {
-//        $options['v'] = join(';', $this->arguments['values']);
-//    } else {
-//        $options['v'] = $this->arguments['values'];
-//    }
-//}
-
-//$items = array();
-//
-//        if (!count($options)) {
-//            $options = array(
-//                'host' => array('hc_id', 'hc_name'),
-//                'service' => array('sc_id', 'sc_name'),
-//            );
-//        }
-//
-//       $request = $this->constructRequest($options);
-
-//    public function getObjectForSelect2($values = array(), $options = array())
-//    {
-//
-//
-//        $explodedValues = implode(',', $values);
-//        if (empty($explodedValues)) {
-//            $explodedValues = "''";
-//        }
-//
-//        # get list of selected service criticities
-//        if (isset ($this->options['host'])){
-//            $query = "SELECT sc_id, sc_name "
-//                . "FROM service_categories "
-//                . "WHERE sc_id IN (" . $explodedValues . ") "
-//                . "ORDER BY sc_name ";
-//        }
-//
-//        # get list of selected host criticities
-//        if ($options = 2){
-//            $query = "SELECT hc_id, sc_name "
-//                . "FROM host_categories "
-//                . "WHERE hc_id IN (" . $explodedValues . ") "
-//                . "ORDER BY hc_name ";
-//        }
-//
-//        $resRetrieval = $this->db->query($query);
-//        while ($row = $resRetrieval->fetchRow()) {
-//            $items[] = array(
-//                'id' => $row['sc_id'],
-//                'text' => $row['sc_name']
-//            );
-//        }
-//
-//        return $items;
-//    }
-
-
     public function getObjectForSelect2($values = array(), $options = array())
     {
         $items = array();
@@ -145,31 +80,24 @@ class CentreonCriticality
             $explodedValues = "''";
         }
 
-        if(isset($options['defaultDatasetOptions'])){
-            # get list of selected host criticities
-            $query = "SELECT hc_id, hc_name "
-                . "FROM host_categories "
-                . "WHERE hc_id IN (" . $explodedValues . ") "
-                . "ORDER BY hc_name ";
-        }else{
-            # get list of selected criticities
-            $query = "SELECT sc_id, sc_name "
-                . "FROM service_categories "
-                . "WHERE sc_id IN (" . $explodedValues . ") "
-                . "ORDER BY sc_name ";
-        }
+        # get list of selected host criticities
+        $query = "SELECT hc_id, hc_name, level "
+            . "FROM hostcategories "
+            . "WHERE hc_id IN (" . $explodedValues . ") "
+            . "ORDER BY level ";
 
         $resRetrieval = $this->db->query($query);
         while ($row = $resRetrieval->fetchRow()) {
             $items[] = array(
-                'id' => $row['sc_id'],
-                'text' => $row['sc_name']
+                'id' => $row['hc_id'],
+                'text' => $row['hc_name']
             );
 
         }
 
         return $items;
     }
+
 
 
     /**
@@ -181,7 +109,7 @@ class CentreonCriticality
     public function getDataForHosts($critId)
     {
         static $data = array();
-        
+
         if (!isset($data[$critId])) {
             $sql = "SELECT hc_id, hc_name, level, icon_id, hc_comment
                     FROM hostcategories 
@@ -200,7 +128,7 @@ class CentreonCriticality
         }
         return null;
     }
-    
+
     /**
      * Get data of a criticality object for services
      *
@@ -210,7 +138,7 @@ class CentreonCriticality
     public function getDataForServices($critId)
     {
         static $data = array();
-        
+
         if (!isset($data[$critId])) {
             $sql = "SELECT sc_id, sc_name, level, icon_id, sc_description
                     FROM service_categories 
@@ -229,7 +157,7 @@ class CentreonCriticality
         }
         return null;
     }
-    
+
     /**
      * Get list of criticality
      *
@@ -360,7 +288,7 @@ class CentreonCriticality
         }
         return $elements;
     }
-    
+
     /**
      * Get list of service criticalities
      *
@@ -425,7 +353,7 @@ class CentreonCriticality
         }
         return 0;
     }
-    
+
     /**
      * Get service criticality
      *
@@ -469,11 +397,11 @@ class CentreonCriticality
     public function getHostTplCriticities($host_id, $cache)
     {
         global $pearDB;
-        
+
         if (!$host_id) {
             return null;
         }
-        
+
         $rq = "SELECT host_tpl_id " .
             "FROM host_template_relation " .
             "WHERE host_host_id = '".$host_id."' " .
