@@ -998,6 +998,9 @@ div.menuLeft {
     padding: .4em .4em 0.4em 0.4em;
     text-decoration: none;
 }
+#global_health {
+    text-align: center;
+}
 
 .viewBody .widgetBody .portlet {
     border: 1px solid #e7e7e8 !important;
