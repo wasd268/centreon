@@ -19,7 +19,7 @@ function CentreonToolTip()
 	}
 	
 	this.render = function() {
-		$$('img.' + _self._className).each(function(el){
+		jQuery('img.' + _self._className).each(function(el){
 			el.src = _self._source;
 			el.setStyle('cursor:pointer');
 			if (Prototype.Browser.IE == true) {
