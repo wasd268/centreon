@@ -58,7 +58,7 @@ try {
     ;
     bind_textdomain_codeset("messages", "UTF-8");
     textdomain("messages");
-    
+
     if (CentreonSession::checkSession(session_id(), $db) == 0) {
         throw new Exception('Invalid session');
     }
@@ -100,7 +100,7 @@ try {
     $template->assign("widgetNumber", $widgetNumber);
     $template->assign("view_id", $viewId);
     $template->assign("error_msg", _("No widget configured in this view. Please add a new widget with the \"Add widget\" button."));
-    $template->display($columnClass.".ihtml");
+    $template->display($columnClass.".html");
 } catch (CentreonWidgetException $e) {
     echo $e->getMessage() . "<br/>";
 } catch (CentreonCustomViewException $e) {
@@ -185,11 +185,19 @@ jQuery(function() {
     }
 
     jQuery(".ui-icon-wrench").each(function(index, element) {
-                                        var tmp = jQuery(element).parents('.portlet').attr('name')
-                                        var widgetIndex = tmp.split("portlet_");
-                                        var widgetId = widgetIndex[1];
-                                        initColorbox(jQuery(element), "./main.php?p=10303&min=1&view_id="+viewId+"&widget_id="+widgetId, "70%", "70%");
-                                   });
+        var tmp = jQuery(element).parents('.portlet').attr('name'),
+            widgetIndex = tmp.split("portlet_"),
+            widgetId = widgetIndex[1];
+
+        jQuery(element).on('click', function() {
+            var popin = jQuery('<div id="config-popin">');
+            popin.centreonPopin({
+                url: "./main.php?p=10303&min=1&view_id="+viewId+"&widget_id="+widgetId,
+                open: true,
+                ajaxDataType: 'html'
+             });
+        });
+    });
 
     jQuery(".ui-icon-refresh").each(function(index, element) {
         var tmp = jQuery(element).parents('.portlet').attr('name')
@@ -201,7 +209,7 @@ jQuery(function() {
     });
 
     jQuery("span[class='ui-icon ui-icon-trash']").each(function(index, element) {
-                                        var tmp = jQuery(element).parents('.portlet').attr('name')
+                                        var tmp = jQuery(element).parents('.portlet').attr('name');
                                         var widgetIndex = tmp.split("portlet_");
                                         var widgetId = widgetIndex[1];
                                         deleteWidget(element, viewId, widgetId);
