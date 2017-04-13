@@ -672,7 +672,7 @@ jQuery(function () {
   /* Initialize buttons */
   jQuery('.addView').button({ icons : { primary: 'ui-icon-plus'}}).on('click', function () {
     //reset select2
-    jQuery("#formAddView #viewLoad").empty().append($('<option>'));
+    jQuery("#formAddView #viewLoad").empty().append(jQuery('<option>'));
     //reset add view form
     jQuery('input[name="create_load[create_load]"][value="create"]').prop('checked', true);
     jQuery('.load_field').css('display','none');
