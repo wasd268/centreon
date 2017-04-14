@@ -226,6 +226,7 @@ class Host extends AbstractHost {
         $host['macros']['_HOST_ID'] = $host['host_id'];
 
         $hostObj = new CentreonHost($this->backend_instance->db);
+
         $template = $hostObj->getInheritedValues($host['host_id'], array(), -1, array('host_location'));
 
         $oTimezone = Timezone::getInstance($this->dependencyInjector);
@@ -233,7 +234,6 @@ class Host extends AbstractHost {
         if (!is_null($sTimezone)) {
             $host['timezone'] = ":". $sTimezone;
         }
-
         $this->getHostTemplates($host);
         $this->getHostCommands($host);
         $this->getHostPeriods($host);
@@ -244,16 +244,15 @@ class Host extends AbstractHost {
         $this->getSeverity($host['host_id']);
         $this->getServices($host);
         $this->getServicesByHg($host);
-
         $this->generateObjectInFile($host, $host['host_id']);
         $this->addGeneratedHost($host['host_id']);
+
     }
 
     public function generateFromPollerId($poller_id, $localhost=0) {
         if (is_null($this->hosts)) {
             $this->getHosts($poller_id);
         }
-
         Service::getInstance($this->dependencyInjector)->set_poller($poller_id);
 
         foreach ($this->hosts as $host_id => &$host) {

@@ -107,6 +107,7 @@ try {
         ));
     }
 
+
     # Sync contactgroups to ldap
     $cgObj = new CentreonContactgroup($pearDB);
     $cgObj->syncWithLdap();
@@ -116,6 +117,7 @@ try {
         $config_generate->configPollers($username);
     } else {
         foreach ($pollers as $poller) {
+
             $config_generate->reset();
             $config_generate->configPollerFromId($poller, $username);
         }
