@@ -190,8 +190,6 @@ class Backend {
         $mysql_port = $conf_centreon["port"] ? $conf_centreon["port"] : '3306';
 */
         $this->db = $dependencyInjector['configuration_db'];
-
-
         /*
             new PDO("mysql:dbname=pdo;host=" . $mysql_host . ";port=" . $mysql_port . ";dbname=" . $mysql_database,
         $mysql_user, $mysql_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));

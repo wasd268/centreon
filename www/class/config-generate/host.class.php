@@ -234,6 +234,7 @@ class Host extends AbstractHost {
         if (!is_null($sTimezone)) {
             $host['timezone'] = ":". $sTimezone;
         }
+
         $this->getHostTemplates($host);
         $this->getHostCommands($host);
         $this->getHostPeriods($host);
@@ -244,9 +245,9 @@ class Host extends AbstractHost {
         $this->getSeverity($host['host_id']);
         $this->getServices($host);
         $this->getServicesByHg($host);
+
         $this->generateObjectInFile($host, $host['host_id']);
         $this->addGeneratedHost($host['host_id']);
-
     }
 
     public function generateFromPollerId($poller_id, $localhost=0) {
