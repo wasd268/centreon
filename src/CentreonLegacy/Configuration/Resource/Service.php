@@ -38,7 +38,6 @@ namespace CentreonLegacy\Configuration\Resource;
 use \Pimple\Container;
 use \CentreonLegacy\Configuration\Resource\Poller;
 
-
 class Service extends BaseResource
 {
     /**
@@ -158,7 +157,6 @@ class Service extends BaseResource
         static $hgSvcTab = array();
 
         if (!isset($hgSvcTab[$hgName])) {
-
             $hgName = $this->dependencyInjector['configuration_db']->escape($hgName);
 
             $rq = "SELECT hsr.service_service_id, s.service_description " .
@@ -420,7 +418,6 @@ class Service extends BaseResource
         );
         foreach ($macros as $key => $value) {
             if ($value != "" && !isset($stored[strtolower($value)])) {
-
                 $serviceMacroName = strtoupper($this->dependencyInjector['configuration_db']->escape($value));
                 $macroValue = strtoupper($this->dependencyInjector['configuration_db']->escape($macroValues[$key]));
                 $macroDescription = $this->dependencyInjector['configuration_db']->escape($macroDescription[$key]);
@@ -790,7 +787,7 @@ class Service extends BaseResource
 
         //Get macro attached to the command
         if (!empty($iIdCommande)) {
-            $oCommand = new CentreonCommand($this->db);
+            $oCommand = new CentreonCommand($this->dependencyInjector['configuration_db']);
             $macroTmp = $oCommand->getMacroByIdAndType($iIdCommande, 'service');
             foreach ($macroTmp as $tmpmacro) {
                 $tmpmacro['macroTpl_#index#'] = $templateName . ' Commande : ' . $tmpmacro['macroCommandFrom'];
@@ -845,7 +842,10 @@ class Service extends BaseResource
         $this->purgeOldMacroToForm($macroArray, $form, 'fromTpl');
         $aListTemplate = array();
         if (isset($form['service_template_model_stm_id']) && !empty($form['service_template_model_stm_id'])) {
-            $aListTemplate = getListTemplates($this->db, $form['service_template_model_stm_id']);
+            $aListTemplate = getListTemplates(
+                $this->dependencyInjector['configuration_db'],
+                $form['service_template_model_stm_id']
+            );
         }
         //Get macro attached to the template
         $aMacroTemplate = array();
@@ -870,7 +870,7 @@ class Service extends BaseResource
 
         //Get macro attached to the command
         if (!empty($iIdCommande)) {
-            $oCommand = new CentreonCommand($this->db);
+            $oCommand = new CentreonCommand($this->dependencyInjector['configuration_db']);
 
             $macroTmp = $oCommand->getMacroByIdAndType($iIdCommande, 'service');
             foreach ($macroTmp as $tmpmacro) {
@@ -1217,7 +1217,6 @@ class Service extends BaseResource
                 default:
                     break;
             }
-
         }
     }
 
@@ -1317,7 +1316,7 @@ class Service extends BaseResource
             '(service_template_model_stm_id, command_command_id, timeperiod_tp_id, command_command_id2, ' .
             'timeperiod_tp_id2, service_description, service_alias, service_is_volatile, service_max_check_attempts, ' .
             'service_normal_check_interval, service_retry_check_interval, service_active_checks_enabled, ' .
-            'service_passive_checks_enabled, service_obsess_over_service, service_check_freshness, '.
+            'service_passive_checks_enabled, service_obsess_over_service, service_check_freshness, ' .
             'service_freshness_threshold, service_event_handler_enabled, service_low_flap_threshold, ' .
             'service_high_flap_threshold, service_flap_detection_enabled, service_process_perf_data, ' .
             ' service_retain_status_information, service_retain_nonstatus_information, ' .
@@ -1343,10 +1342,10 @@ class Service extends BaseResource
             ? $rq .= "'" . $ret["timeperiod_tp_id2"] . "', "
             : $rq .= "NULL, ";
         isset($ret["service_description"]) && $ret["service_description"] != null
-            ? $rq .= "'" . CentreonDB::escape($ret["service_description"]) . "', "
+            ? $rq .= "'" . $this->dependencyInjector['configuration_db']->escape($ret["service_description"]) . "', "
             : $rq .= "NULL, ";
         isset($ret["service_alias"]) && $ret["service_alias"] != null
-            ? $rq .= "'" . CentreonDB::escape($ret["service_alias"]) . "', "
+            ? $rq .= "'" . $this->dependencyInjector['configuration_db']->escape($ret["service_alias"]) . "', "
             : $rq .= "NULL, ";
         isset($ret["service_is_volatile"]) && $ret["service_is_volatile"]["service_is_volatile"] != 2
             ? $rq .= "'" . $ret["service_is_volatile"]["service_is_volatile"] . "', "
@@ -1432,14 +1431,16 @@ class Service extends BaseResource
             ? $rq .= "'" . $ret["service_first_notification_delay"] . "', "
             : $rq .= "NULL, ";
         isset($ret["service_comment"]) && $ret["service_comment"] != null
-            ? $rq .= "'" . CentreonDB::escape($ret["service_comment"]) . "', "
+            ? $rq .= "'" . $this->dependencyInjector['configuration_db']->escape($ret["service_comment"]) . "', "
             : $rq .= "NULL, ";
         $ret['command_command_id_arg'] = $this->getCommandArgs($ret, $ret);
         isset($ret["command_command_id_arg"]) && $ret["command_command_id_arg"] != null
-            ? $rq .= "'" . CentreonDB::escape($ret["command_command_id_arg"]) . "', "
+            ? $rq .= "'" . $this->dependencyInjector['configuration_db']->escape($ret["command_command_id_arg"]) . "', "
             : $rq .= "NULL, ";
         isset($ret["command_command_id_arg2"]) && $ret["command_command_id_arg2"] != null
-            ? $rq .= "'" . CentreonDB::escape($ret["command_command_id_arg2"]) . "', "
+            ? $rq .= "'" . $this->dependencyInjector['configuration_db']->escape(
+                $ret["command_command_id_arg2"]
+            ) . "', "
             : $rq .= "NULL, ";
         isset($ret["service_register"]) && $ret["service_register"] != null
             ? $rq .= "'" . $ret["service_register"] . "', "
@@ -1453,19 +1454,480 @@ class Service extends BaseResource
         $rq .= ")";
 
         try {
-            $DBRESULT = $this->db->query($rq);
+            $dbResult = $this->dependencyInjector['configuration_db']->query($rq);
         } catch (\PDOException $e) {
             throw new \Exception('Error while insert service ' . $ret['service_description']);
         }
 
-        $DBRESULT = $this->db->query("SELECT MAX(service_id) as service_id FROM service");
-        $service_id = $DBRESULT->fetchRow();
+        $dbResult = $this->dependencyInjector['configuration_db']->query(
+            "SELECT MAX(service_id) as service_id FROM service"
+        );
+        $serviceId = $dbResult->fetchRow();
 
-        $ret['service_service_id'] = $service_id['service_id'];
+        $ret['service_service_id'] = $serviceId['service_id'];
         $this->insertExtendInfo($ret);
 
-        return $service_id['service_id'];
+        return $serviceId['service_id'];
     }
 
 
+    /**
+     * @param $aDatas
+     */
+    public function insertExtendInfo($aDatas)
+    {
+
+        if (empty($aDatas['service_service_id'])) {
+            return;
+        }
+        $rq = 'INSERT INTO extended_service_information ' .
+            '(service_service_id, esi_notes, esi_notes_url, esi_action_url, esi_icon_image, ' .
+            'esi_icon_image_alt, graph_id) ' .
+            'VALUES ';
+        $rq .= "('" . $aDatas['service_service_id'] . "', ";
+        isset($aDatas["esi_notes"])
+            ? $rq .= "'" . $this->dependencyInjector['configuration_db']->escape($aDatas["esi_notes"]) . "',"
+            : $rq .= "NULL, ";
+        isset($aDatas["esi_notes_url"])
+            ? $rq .= "'" . $this->dependencyInjector['configuration_db']->escape($aDatas["esi_notes_url"]) . "',"
+            : $rq .= "NULL, ";
+        isset($aDatas["esi_action_url"])
+            ? $rq .= "'" . $this->dependencyInjector['configuration_db']->escape($aDatas["esi_action_url"]) . "',"
+            : $rq .= "NULL, ";
+        isset($aDatas["esi_icon_image"])
+            ? $rq .= "'" . $this->dependencyInjector['configuration_db']->escape($aDatas["esi_icon_image"]) . "',"
+            : $rq .= "NULL, ";
+        isset($aDatas["esi_icon_image_alt"])
+            ? $rq .= "'" . $this->dependencyInjector['configuration_db']->escape($aDatas["esi_icon_image_alt"]) . "',"
+            : $rq .= "NULL, ";
+        isset($aDatas["graph_id"])
+            ? $rq .= $this->dependencyInjector['configuration_db']->escape($aDatas["graph_id"])
+            : $rq .= "NULL ";
+        $rq .= ")";
+
+        $this->dependencyInjector['configuration_db']->query($rq);
+    }
+
+
+    /**
+     *
+     * @param array $ret
+     */
+    public function update($serviceId, $ret)
+    {
+        $rq = 'UPDATE service SET ';
+        $rq .= "service_template_model_stm_id = ";
+        isset($ret["service_template_model_stm_id"]) && $ret["service_template_model_stm_id"] != null
+            ? $rq .= "'" . $ret["service_template_model_stm_id"] . "', "
+            : $rq .= "NULL, ";
+        $rq .= "command_command_id = ";
+        isset($ret["command_command_id"]) && $ret["command_command_id"] != null
+            ? $rq .= "'" . $ret["command_command_id"] . "', "
+            : $rq .= "NULL, ";
+        $rq .= "timeperiod_tp_id = ";
+        isset($ret["timeperiod_tp_id"]) && $ret["timeperiod_tp_id"] != null
+            ? $rq .= "'" . $ret["timeperiod_tp_id"] . "', "
+            : $rq .= "NULL, ";
+        $rq .= "command_command_id2 = ";
+        isset($ret["command_command_id2"]) && $ret["command_command_id2"] != null
+            ? $rq .= "'" . $ret["command_command_id2"] . "', "
+            : $rq .= "NULL, ";
+        $rq .= "service_description = ";
+        isset($ret["service_description"]) && $ret["service_description"] != null
+            ? $rq .= "'" . $this->dependencyInjector['configuration_db']->escape($ret["service_description"]) . "', "
+            : $rq .= "NULL, ";
+        $rq .= "service_alias = ";
+        isset($ret["service_alias"]) && $ret["service_alias"] != null
+            ? $rq .= "'" . $this->dependencyInjector['configuration_db']->escape($ret["service_alias"]) . "', "
+            : $rq .= "NULL, ";
+        $rq .= "service_acknowledgement_timeout = ";
+        isset($ret["service_acknowledgement_timeout"]) && $ret["service_acknowledgement_timeout"] != null
+            ? $rq .= "'" . $ret["service_acknowledgement_timeout"] . "', "
+            : $rq .= "NULL, ";
+        $rq .= "service_is_volatile = ";
+        isset($ret["service_is_volatile"]["service_is_volatile"]) &&
+        $ret["service_is_volatile"]["service_is_volatile"] != 2
+            ? $rq .= "'" . $ret["service_is_volatile"]["service_is_volatile"] . "', "
+            : $rq .= "'2', ";
+        $rq .= "service_max_check_attempts = ";
+        isset($ret["service_max_check_attempts"]) && $ret["service_max_check_attempts"] != null
+            ? $rq .= "'" . $ret["service_max_check_attempts"] . "', "
+            : $rq .= "NULL, ";
+        $rq .= "service_normal_check_interval = ";
+        isset($ret["service_normal_check_interval"]) && $ret["service_normal_check_interval"] != null
+            ? $rq .= "'" . $ret["service_normal_check_interval"] . "', "
+            : $rq .= "NULL, ";
+        $rq .= "service_retry_check_interval = ";
+        isset($ret["service_retry_check_interval"]) && $ret["service_retry_check_interval"] != null
+            ? $rq .= "'" . $ret["service_retry_check_interval"] . "', "
+            : $rq .= "NULL, ";
+        $rq .= "service_active_checks_enabled = ";
+        isset($ret["service_active_checks_enabled"]["service_active_checks_enabled"]) &&
+        $ret["service_active_checks_enabled"]["service_active_checks_enabled"] != 2
+            ? $rq .= "'" . $ret["service_active_checks_enabled"]["service_active_checks_enabled"] . "', "
+            : $rq .= "'2', ";
+        $rq .= "service_passive_checks_enabled = ";
+        isset($ret["service_passive_checks_enabled"]["service_passive_checks_enabled"]) &&
+        $ret["service_passive_checks_enabled"]["service_passive_checks_enabled"] != 2
+            ? $rq .= "'" . $ret["service_passive_checks_enabled"]["service_passive_checks_enabled"] . "', "
+            : $rq .= "'2', ";
+        $rq .= "service_obsess_over_service = ";
+        isset($ret["service_obsess_over_service"]["service_obsess_over_service"]) &&
+        $ret["service_obsess_over_service"]["service_obsess_over_service"] != 2
+            ? $rq .= "'" . $ret["service_obsess_over_service"]["service_obsess_over_service"] . "', "
+            : $rq .= "'2', ";
+        $rq .= "service_check_freshness = ";
+        isset($ret["service_check_freshness"]["service_check_freshness"]) &&
+        $ret["service_check_freshness"]["service_check_freshness"] != 2
+            ? $rq .= "'" . $ret["service_check_freshness"]["service_check_freshness"] . "', "
+            : $rq .= "'2', ";
+        $rq .= "service_freshness_threshold = ";
+        isset($ret["service_freshness_threshold"]) && $ret["service_freshness_threshold"] != null
+            ? $rq .= "'" . $ret["service_freshness_threshold"] . "', "
+            : $rq .= "NULL, ";
+        $rq .= "service_event_handler_enabled = ";
+        isset($ret["service_event_handler_enabled"]["service_event_handler_enabled"]) &&
+        $ret["service_event_handler_enabled"]["service_event_handler_enabled"] != 2
+            ? $rq .= "'" . $ret["service_event_handler_enabled"]["service_event_handler_enabled"] . "', "
+            : $rq .= "'2', ";
+        $rq .= "service_low_flap_threshold = ";
+        isset($ret["service_low_flap_threshold"]) && $ret["service_low_flap_threshold"] != null
+            ? $rq .= "'" . $ret["service_low_flap_threshold"] . "', "
+            : $rq .= "NULL, ";
+        $rq .= "service_high_flap_threshold = ";
+        isset($ret["service_high_flap_threshold"]) && $ret["service_high_flap_threshold"] != null
+            ? $rq .= "'" . $ret["service_high_flap_threshold"] . "', "
+            : $rq .= "NULL, ";
+        $rq .= "service_flap_detection_enabled = ";
+        isset($ret["service_flap_detection_enabled"]["service_flap_detection_enabled"]) &&
+        $ret["service_flap_detection_enabled"]["service_flap_detection_enabled"] != 2
+            ? $rq .= "'" . $ret["service_flap_detection_enabled"]["service_flap_detection_enabled"] . "', "
+            : $rq .= "'2', ";
+        $rq .= "service_process_perf_data = ";
+        isset($ret["service_process_perf_data"]["service_process_perf_data"]) &&
+        $ret["service_process_perf_data"]["service_process_perf_data"] != 2
+            ? $rq .= "'" . $ret["service_process_perf_data"]["service_process_perf_data"] . "', "
+            : $rq .= "'2', ";
+        $rq .= "service_retain_status_information = ";
+        isset($ret["service_retain_status_information"]["service_retain_status_information"]) &&
+        $ret["service_retain_status_information"]["service_retain_status_information"] != 2
+            ? $rq .= "'" . $ret["service_retain_status_information"]["service_retain_status_information"] . "', "
+            : $rq .= "'2', ";
+        $rq .= "service_retain_nonstatus_information = ";
+        isset($ret["service_retain_nonstatus_information"]["service_retain_nonstatus_information"]) &&
+        $ret["service_retain_nonstatus_information"]["service_retain_nonstatus_information"] != 2
+            ? $rq .= "'" . $ret["service_retain_nonstatus_information"]["service_retain_nonstatus_information"] . "', "
+            : $rq .= "'2', ";
+        $rq .= "service_notifications_enabled = ";
+        isset($ret["service_notifications_enabled"]["service_notifications_enabled"]) &&
+        $ret["service_notifications_enabled"]["service_notifications_enabled"] != 2
+            ? $rq .= "'" . $ret["service_notifications_enabled"]["service_notifications_enabled"] . "', "
+            : $rq .= "'2', ";
+        $rq .= "service_inherit_contacts_from_host = ";
+        isset($ret["service_inherit_contacts_from_host"]["service_inherit_contacts_from_host"]) &&
+        $ret["service_inherit_contacts_from_host"]["service_inherit_contacts_from_host"] != null
+            ? $rq .= "'" . $ret["service_inherit_contacts_from_host"]["service_inherit_contacts_from_host"] . "', "
+            : $rq .= "NULL, ";
+        $rq .= "service_use_only_contacts_from_host = ";
+        isset($ret["service_use_only_contacts_from_host"]["service_use_only_contacts_from_host"]) &&
+        $ret["service_use_only_contacts_from_host"]["service_use_only_contacts_from_host"] != null
+            ? $rq .= "'" . $ret["service_use_only_contacts_from_host"]["service_use_only_contacts_from_host"] . "', "
+            : $rq .= "NULL, ";
+        $rq .= "contact_additive_inheritance = ";
+        $rq .= (isset($ret['contact_additive_inheritance']) ? 1 : 0) . ', ';
+        $rq .= "cg_additive_inheritance = ";
+        $rq .= (isset($ret['cg_additive_inheritance']) ? 1 : 0) . ', ';
+
+        $rq .= "service_stalking_options = ";
+        isset($ret["service_stalOpts"]) && $ret["service_stalOpts"] != null
+            ? $rq .= "'" . implode(",", array_keys($ret["service_stalOpts"])) . "', "
+            : $rq .= "NULL, ";
+        $rq .= "service_comment = ";
+        isset($ret["service_comment"]) && $ret["service_comment"] != null
+            ? $rq .= "'" . $this->dependencyInjector['configuration_db']->escape($ret["service_comment"]) . "', "
+            : $rq .= "NULL, ";
+        $ret["command_command_id_arg"] = $this->getCommandArgs($ret, $ret);
+        $rq .= "command_command_id_arg = ";
+        isset($ret["command_command_id_arg"]) && $ret["command_command_id_arg"] != null
+            ? $rq .= "'" . $this->dependencyInjector['configuration_db']->escape($ret["command_command_id_arg"]) . "', "
+            : $rq .= "NULL, ";
+        $rq .= "command_command_id_arg2 = ";
+        isset($ret["command_command_id_arg2"]) && $ret["command_command_id_arg2"] != null
+            ? $rq .= "'" . $this->dependencyInjector['configuration_db']->escape(
+                $ret["command_command_id_arg2"]
+            ) . "', "
+            : $rq .= "NULL, ";
+        $rq .= "service_register = ";
+        isset($ret["service_register"]) && $ret["service_register"] != null
+            ? $rq .= "'" . $ret["service_register"] . "', "
+            : $rq .= "NULL, ";
+        $rq .= "service_activate = ";
+        isset($ret["service_activate"]["service_activate"]) && $ret["service_activate"]["service_activate"] != null
+            ? $rq .= "'" . $ret["service_activate"]["service_activate"] . "' "
+            : $rq .= "NULL ";
+        $rq .= "WHERE service_id = '" . $serviceId . "'";
+
+        $this->dependencyInjector['configuration_db']->query($rq);
+        $this->updateExtendedInfos($serviceId, $ret);
+    }
+
+
+    /**
+     * @param $service_id
+     * @param $ret
+     * @throws \Exception
+     */
+    public function updateExtendedInfos($serviceId, $ret)
+    {
+        $fields = array(
+            'esi_notes' => 'esi_notes',
+            'esi_notes_url' => 'esi_notes_url',
+            'esi_action_url' => 'esi_action_url',
+            'esi_icon_image' => 'esi_icon_image',
+            'esi_icon_image_alt' => 'esi_icon_image_alt',
+            'graph_id' => 'graph_id'
+        );
+
+        $query = "UPDATE extended_service_information SET ";
+        $updateFields = array();
+        foreach ($ret as $key => $value) {
+            if (isset($fields[$key])) {
+                $updateFields[] = '`' . $fields[$key] . '` = "' .
+                    $this->dependencyInjector['configuration_db']->escape($value) . '" ';
+            }
+        }
+        if (count($updateFields)) {
+            $query .= implode(',', $updateFields)
+                . 'WHERE service_service_id = "' . $serviceId . '" ';
+            try {
+                $this->dependencyInjector['configuration_db']->query($query);
+            } catch (\PDOException $e) {
+                throw new \Exception('Error while updating extendeded infos of service ' . $serviceId);
+            }
+        }
+    }
+
+    /**
+     * @param array $argArray
+     * @param array $conf
+     * @return mixed|null|string
+     */
+    public function getCommandArgs($argArray = array(), $conf = array())
+    {
+        if (isset($conf['command_command_id_arg'])) {
+            return $conf['command_command_id_arg'];
+        }
+        $argTab = array();
+        foreach ($argArray as $key => $value) {
+            if (preg_match('/^ARG(\d+)/', $key, $matches)) {
+                $argTab[$matches[1]] = $value;
+                $argTab[$matches[1]] = str_replace("\n", "#BR#", $argTab[$matches[1]]);
+                $argTab[$matches[1]] = str_replace("\t", "#T#", $argTab[$matches[1]]);
+                $argTab[$matches[1]] = str_replace("\r", "#R#", $argTab[$matches[1]]);
+            }
+        }
+        ksort($argTab);
+        $str = "";
+        foreach ($argTab as $val) {
+            if ($val != "") {
+                $str .= "!" . $val;
+            }
+        }
+        if (!strlen($str)) {
+            return null;
+        }
+        return $str;
+    }
+
+
+    /**
+     * Returns service details
+     *
+     * @param int $id
+     * @return array
+     */
+    public function getParameters($id, $parameters = array(), $monitoringDB = false)
+    {
+        $sElement = "*";
+        $arr = array();
+        if (empty($id)) {
+            return array();
+        }
+        if (count($parameters) > 0) {
+            $sElement = implode(",", $parameters);
+        }
+
+        $table = 'service';
+        $db = $this->dependencyInjector['configuration_db'];
+        if ($monitoringDB) {
+            $table = 'services';
+            $db = $this->dependencyInjector['realtime_db'];
+        }
+
+        $res = $db->query(
+            "SELECT " . $sElement . " " .
+            "FROM " . $table . " " .
+            "WHERE service_id = " . $db->escape($id)
+        );
+
+        if ($res->numRows()) {
+            $arr = $res->fetchRow();
+        }
+
+        return $arr;
+    }
+
+
+    /**
+     * @param $svcId
+     * @param array $alreadyProcessed
+     * @return array
+     */
+    public function getTemplatesChain($svcId, $alreadyProcessed = array())
+    {
+        $svcTmpl = array();
+        if (in_array($svcId, $alreadyProcessed)) {
+            return $svcTmpl;
+        } else {
+            $alreadyProcessed[] = $svcId;
+
+            $res = $this->dependencyInjector['configuration_db']->query(
+                "SELECT service_template_model_stm_id FROM service WHERE service_id = " .
+                $this->dependencyInjector['configuration_db']->escape($svcId)
+            );
+
+            if ($res->numRows()) {
+                $row = $res->fetchRow();
+                if (!empty($row['service_template_model_stm_id']) && $row['service_template_model_stm_id'] !== null) {
+                    $svcTmpl = array_merge(
+                        $svcTmpl,
+                        $this->getTemplatesChain($row['service_template_model_stm_id'], $alreadyProcessed)
+                    );
+                    $svcTmpl[] = $row['service_template_model_stm_id'];
+                }
+            }
+            return $svcTmpl;
+        }
+    }
+
+
+    /**
+     * @param $serviceDescription
+     * @throws \Exception
+     */
+    public function deleteByDescription($serviceDescription)
+    {
+        $sQuery = 'DELETE FROM service '
+            . 'WHERE service_description = "' .
+            $this->dependencyInjector['configuration_db']->escape($serviceDescription) . '"';
+
+        try {
+            $this->dependencyInjector['configuration_db']->query($sQuery);
+        } catch (\PDOException $e) {
+            throw new \Exception('Error while delete service ' . $serviceDescription);
+        }
+    }
+
+
+    /**
+     * @param $serviceId
+     * @param $serviceDescription
+     * @throws \Exception
+     */
+    public function setDescription($serviceId, $serviceDescription)
+    {
+        $query = 'UPDATE service ' .
+            'SET service_description = "' .
+            $this->dependencyInjector['configuration_db']->escape($serviceDescription) . '" ' .
+            'WHERE service_id = ' . $this->dependencyInjector['configuration_db']->escape($serviceId) . ' ';
+
+        try {
+            $this->dependencyInjector['configuration_db']->query($query);
+        } catch (\PDOException $e) {
+            throw new \Exception('Error while updating service ' . $serviceId);
+        }
+    }
+
+    /**
+     * @param $serviceId
+     * @param $serviceAlias
+     * @throws \Exception
+     */
+    public function setAlias($serviceId, $serviceAlias)
+    {
+        $query = 'UPDATE service ' .
+            'SET service_alias = "' . $this->dependencyInjector['configuration_db']->escape($serviceAlias) . '" ' .
+            'WHERE service_id = ' . $this->dependencyInjector['configuration_db']->escape($serviceId) . ' ';
+
+        try {
+            $this->dependencyInjector['configuration_db']->query($query);
+        } catch (\PDOException $e) {
+            throw new \Exception('Error while updating service ' . $serviceId);
+        }
+    }
+
+
+    /**
+     * @param $serviceDescription
+     * @param bool $getHostName
+     * @return array
+     */
+    public function getLinkedHostsByServiceDescription($serviceDescription, $getHostName = false)
+    {
+        $hosts = array();
+
+        $select = 'SELECT h.host_id ';
+        if ($getHostName) {
+            $select .= ', h.host_name ';
+        }
+
+        $from = 'FROM host_service_relation hsr, host h, service s ';
+
+        $where = 'WHERE hsr.host_host_id = h.host_id ' .
+            'AND hsr.service_service_id = s.service_id ' .
+            'AND s.service_description = "' .
+            $this->dependencyInjector['configuration_db']->escape($serviceDescription) . '" ';
+
+        $query = $select . $from . $where;
+
+        $result = $this->dependencyInjector['configuration_db']->query($query);
+
+        while ($row = $result->fetchRow()) {
+            if ($getHostName) {
+                $hosts[] = $row['host_name'];
+            } else {
+                $hosts[] = $row['host_id'];
+            }
+        }
+        $hosts = array_unique($hosts);
+
+        return $hosts;
+    }
+
+    public function getMonitoringFullName($serviceId, $hostId = null)
+    {
+        $name = null;
+
+        $result = CentreonHook::execute('Service', 'getMonitoringFullName', $serviceId);
+        foreach ($result as $fullName) {
+            if (!is_null($fullName) && $fullName != '') {
+                return $fullName;
+            }
+        }
+
+        $query = 'SELECT CONCAT (h.name, " - ", s.description) as fullname ' .
+            'FROM hosts h, services s ' .
+            'WHERE h.host_id = s.host_id ' .
+            'AND s.enabled = "1" ' .
+            'AND s.service_id = ' . $serviceId;
+        if (isset($hostId)) {
+            $query .= ' AND s.host_id = ' . $hostId;
+        }
+        $result = $this->dependencyInjector['realtime_db']->query($query);
+        while ($row = $result->fetchRow()) {
+            $name = $row['fullname'];
+        }
+
+        return $name;
+    }
 }
