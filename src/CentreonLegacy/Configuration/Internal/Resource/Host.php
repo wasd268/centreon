@@ -190,7 +190,7 @@ class Host extends BaseResource
                 'AND hg.hg_activate = "1" ' .
                 'AND hgr.host_host_id = ' . $this->dependencyInjector['configuration_db']->escape($hostId);
             try {
-                $res = $this->dependencyInjector['configuration_db']->query($queryGetServices);
+                $res = $this->dependencyInjector['configuration_db']->query($queryGetServicesWithHg);
             } catch (\PDOException $e) {
                 return array();
             }
