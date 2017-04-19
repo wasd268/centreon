@@ -33,43 +33,33 @@
  *
  */
 
-session_start();
-DEFINE('STEP_NUMBER', 1);
-$_SESSION['step'] = STEP_NUMBER;
+namespace CentreonLegacy\Core\Install\Step;
 
-require_once 'functions.php';
-$template = getTemplate('./templates');
+class Step6 extends AbstractStep
+{
+    public function getContent()
+    {
+        $installDir = __DIR__ . '/../../../../../www/install';
+        require_once $installDir . '/steps/functions.php';
+        $template = getTemplate($installDir . '/steps/templates');
 
-$title = _('Welcome to Centreon Setup');
+        $parameters = $this->getDatabaseConfiguration();
 
-if (is_file('../install.conf.php')) {
-    $status = 0;
-    $content = sprintf("<p>%s%s</p>",
-                  _('This installer will help you setup your database and your monitoring configuration.'),
-                  _('The entire process should take around ten minutes.'));
-    require_once '../install.conf.php';
-    setSessionVariables($conf_centreon);
-} else {
-    $status = 1;
-    $content = sprintf("<p class='required'>%s (install.conf.php)</p>", _('Configuration file not found.'));
-}
-
-$template->assign('step', STEP_NUMBER);
-$template->assign('title', $title);
-$template->assign('content', $content);
-$template->display('content.tpl');
-?>
-<script type='text/javascript'>
-    var status = <?php echo $status;?>;
-    /**
-     * Validates info
-     * 
-     * @return bool
-     */
-    function validation() {
-       if (status == 0) {
-        return true;
-       }
-       return false;
+        $template->assign('title', _('Database information'));
+        $template->assign('step', 6);
+        $template->assign('parameters', $parameters);
+        return $template->fetch('content.tpl');
     }
-</script>
+
+    public function setDatabaseConfiguration($parameters)
+    {
+        $configurationFile = __DIR__ . "/../../../../../www/install/tmp/database.json";
+        file_put_contents($configurationFile, json_encode($parameters));
+    }
+
+    public function setVersion($version)
+    {
+        $configurationFile = __DIR__ . "/../../../../../www/install/tmp/version.json";
+        file_put_contents($configurationFile, json_encode($version));
+    }
+}

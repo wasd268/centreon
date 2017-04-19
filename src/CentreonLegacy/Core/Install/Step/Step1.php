@@ -33,55 +33,41 @@
  *
  */
 
-session_start();
-require_once __DIR__ . '/../../../../bootstrap.php';
+namespace CentreonLegacy\Core\Install\Step;
 
-$requiredParameters = array(
-    'db_configuration',
-    'db_storage',
-    'db_user',
-    'db_password',
-    'db_password_confirm'
-);
+class Step1 extends AbstractStep
+{
+    public function getContent()
+    {
+        $this->setConfiguration();
 
-$err = array(
-    'required' => array(),
-    'password' => true,
-    'connection' => ''
-);
+        $installDir = __DIR__ . '/../../../../../www/install';
+        require_once $installDir . '/steps/functions.php';
+        $template = getTemplate($installDir . '/steps/templates');
 
-$parameters = filter_input_array(INPUT_POST);
-foreach ($parameters as $name => $value) {
-    if (in_array($name, $requiredParameters) && trim($value) == '') {
-        $err['required'][] = $name;
+        //setSessionVariables($this->configuration);
+
+        $template->assign('title', _('Welcome to Centreon Setup'));
+        $template->assign('step', 1);
+        return $template->fetch('content.tpl');
+    }
+
+    public function setConfiguration()
+    {
+        $configurationFile = __DIR__ . "/../../../../../www/install/install.conf.php";
+
+        if (!$this->dependencyInjector['filesystem']->exists($configurationFile)) {
+            throw new \Exception('Configuration file "install.conf.php" does not exist.');
+        }
+
+        $conf_centreon =  array();
+        require $configurationFile;
+
+        $tmpDir = __DIR__ . '/../../../../../www/install/tmp';
+        if (!$this->dependencyInjector['filesystem']->exists($tmpDir)) {
+            $this->dependencyInjector['filesystem']->mkdir($tmpDir);
+        }
+
+        file_put_contents($tmpDir . '/configuration.json', json_encode($conf_centreon));
     }
 }
-
-if (!in_array('db_password', $err['required']) && !in_array('db_password_confirm', $err['required']) &&
-    $parameters['db_password'] != $parameters['db_password_confirm']) {
-    $err['password'] = false;
-}
-
-try {
-    if ($parameters['address'] == "") {
-        $parameters['address'] = "localhost";
-    }
-    if ($parameters['port'] == "") {
-        $parameters['port'] = "3306";
-    }
-    $link = new \PDO(
-        'mysql:host=' . $parameters['address'] . ';port=' . $parameters['port'],
-            'root',
-            $parameters['root_password']
-    );
-} catch (\PDOException $e) {
-    $err['connection'] = $e->getMessage();
-}
-$link = null;
-
-if (!count($err['required']) && $err['password'] && trim($err['connection']) == '') {
-    $step = new \CentreonLegacy\Core\Install\Step\Step6($dependencyInjector);
-    $step->setDatabaseConfiguration($parameters);
-}
-
-echo json_encode($err);

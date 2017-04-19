@@ -33,55 +33,45 @@
  *
  */
 
-session_start();
-require_once __DIR__ . '/../../../../bootstrap.php';
+namespace CentreonLegacy\Core\Install\Step;
 
-$requiredParameters = array(
-    'db_configuration',
-    'db_storage',
-    'db_user',
-    'db_password',
-    'db_password_confirm'
-);
+class Step9 extends AbstractStep
+{
+    public function getContent()
+    {
+        $installDir = __DIR__ . '/../../../../../www/install';
+        require_once $installDir . '/steps/functions.php';
+        $template = getTemplate($installDir . '/steps/templates');
 
-$err = array(
-    'required' => array(),
-    'password' => true,
-    'connection' => ''
-);
+        $backupDir = __DIR__ . '/../../../../../installDir';
+        $contents = '';
+        if (!is_dir($backupDir)) {
+            $contents .= '<br>Warning : The installation directory cannot be move. ' .
+                'Please create the directory ' . $backupDir . ' ' .
+                'and give it the rigths to apache user to write.';
+        } else {
+            $contents = $this->getAdvertisement();
 
-$parameters = filter_input_array(INPUT_POST);
-foreach ($parameters as $name => $value) {
-    if (in_array($name, $requiredParameters) && trim($value) == '') {
-        $err['required'][] = $name;
+        }
+
+        $template->assign('title', _('Installation finished'));
+        $template->assign('step', 9);
+        $template->assign('finish', 1);
+        $template->assign('blockPreview', 1);
+        $template->assign('contents', $contents);
+        return $template->fetch('content.tpl');
+    }
+
+    private function getAdvertisement()
+    {
+        $adContent = '';
+        if ($sock = fsockopen("www.centreon.com", 80, $num, $error, 5)) {
+            $adContent = "http://blog-centreon-wordpress.s3.amazonaws.com/wp-content/uploads/2015/12/custom_view.jpg";
+        } elseif (file_exists("../../img/centreon.png")) {
+            fclose($sock);
+            $adContent = "../../img/centreon.png";
+        }
+
+        return $adContent;
     }
 }
-
-if (!in_array('db_password', $err['required']) && !in_array('db_password_confirm', $err['required']) &&
-    $parameters['db_password'] != $parameters['db_password_confirm']) {
-    $err['password'] = false;
-}
-
-try {
-    if ($parameters['address'] == "") {
-        $parameters['address'] = "localhost";
-    }
-    if ($parameters['port'] == "") {
-        $parameters['port'] = "3306";
-    }
-    $link = new \PDO(
-        'mysql:host=' . $parameters['address'] . ';port=' . $parameters['port'],
-            'root',
-            $parameters['root_password']
-    );
-} catch (\PDOException $e) {
-    $err['connection'] = $e->getMessage();
-}
-$link = null;
-
-if (!count($err['required']) && $err['password'] && trim($err['connection']) == '') {
-    $step = new \CentreonLegacy\Core\Install\Step\Step6($dependencyInjector);
-    $step->setDatabaseConfiguration($parameters);
-}
-
-echo json_encode($err);

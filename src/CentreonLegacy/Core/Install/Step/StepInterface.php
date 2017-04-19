@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2005-2015 Centreon
+ * Copyright 2005-2017 Centreon
  * Centreon is developped by : Julien Mathis and Romain Le Merlus under
  * GPL Licence 2.0.
  *
@@ -33,37 +33,9 @@
  *
  */
 
-session_start();
-require_once '../functions.php';
+namespace CentreonLegacy\Core\Install\Step;
 
-if (!isset($_POST['broker'])) {
-    echo 'Could not determine specified broker module';
-    exit;
+interface stepInterface
+{
+    public function getContent();
 }
-
-$lines = getParamLines('../../var/brokers', $_POST['broker']);
-$html = "";
-foreach ($lines as $line) {
-    if ($line) {
-        if ($line[0] == '#') {
-            continue;
-        }
-        list($key, $label, $required, $paramType, $default) = explode(';', $line);
-        $val = $default;
-        if (isset($_SESSION[$key])) {
-            $val = $_SESSION[$key];
-        }
-        if ($required) {
-            $star = "<span style='color:#e00b3d'> *</span>";
-        }
-        $html .= "
-                    <tr>
-                    <td class='formlabel'>".$label.$star."</td>
-                    <td class='formvalue'>
-                        <input type='text' name='".$key."' value='".$val."' size='40' />
-                        <label class='field_msg'></label>
-                    </td>
-                    </tr>";
-    }
-}
-echo $html;

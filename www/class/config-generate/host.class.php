@@ -226,7 +226,6 @@ class Host extends AbstractHost {
         $host['macros']['_HOST_ID'] = $host['host_id'];
 
         $hostObj = new CentreonHost($this->backend_instance->db);
-
         $template = $hostObj->getInheritedValues($host['host_id'], array(), -1, array('host_location'));
 
         $oTimezone = Timezone::getInstance($this->dependencyInjector);
@@ -254,6 +253,7 @@ class Host extends AbstractHost {
         if (is_null($this->hosts)) {
             $this->getHosts($poller_id);
         }
+
         Service::getInstance($this->dependencyInjector)->set_poller($poller_id);
 
         foreach ($this->hosts as $host_id => &$host) {

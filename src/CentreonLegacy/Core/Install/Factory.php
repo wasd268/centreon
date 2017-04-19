@@ -1,6 +1,6 @@
 <?php
-/*
- * Copyright 2005-2015 Centreon
+/**
+ * Copyright 2005-2017 Centreon
  * Centreon is developped by : Julien Mathis and Romain Le Merlus under
  * GPL Licence 2.0.
  *
@@ -33,55 +33,31 @@
  *
  */
 
-session_start();
-require_once __DIR__ . '/../../../../bootstrap.php';
-require_once '../functions.php';
-require_once '../../../../config/centreon.config.php';
-require_once '../../../class/centreonDB.class.php';
-require_once '../../../class/centreon-partition/partEngine.class.php';
-require_once '../../../class/centreon-partition/config.class.php';
-require_once '../../../class/centreon-partition/mysqlTable.class.php';
-require_once '../../../class/centreon-partition/options.class.php';
+namespace CentreonLegacy\Core\Install;
 
-$return = array(
-    'id' => 'dbpartitioning',
-    'result' => 1,
-    'msg' => ''
-);
+class Factory
+{
+    /**
+     *
+     * @var Pimple\Container
+     */
+    protected $dependencyInjector;
 
-/* Create partitioned tables */
-$database = new CentreonDB('centstorage', 3, false);
-$partEngine = new PartEngine();
-
-if (!$partEngine->isCompatible($database)) {
-    $return['msg'] = "[" . date(DATE_RFC822) . "] " .
-        "CRITICAL: MySQL server is not compatible with partitionning. MySQL version must be greater or equal to 5.1\n";
-    echo json_encode($return);
-    exit;
-}
-
-$tables = array(
-    'data_bin',
-    'logs',
-    'log_archive_host',
-    'log_archive_service'
-);
-
-try {
-    foreach ($tables as $table) {
-        $config = new Config(
-            $database, _CENTREON_PATH_ . '/config/partition.d/partitioning-' . $table . '.xml'
-        );
-        $mysqlTable = $config->getTable($table);
-        $partEngine->createParts($mysqlTable, $database);
+    /**
+     *
+     * @param \Pimple\Container $dependencyInjector
+     */
+    public function __construct(\Pimple\Container $dependencyInjector)
+    {
+        $this->dependencyInjector = $dependencyInjector;
     }
-} catch (\Exception $e) {
-    $return['msg'] = $e->getMessage();
-    echo json_encode($return);
-    exit;
+
+    /**
+     *
+     * @return \CentreonLegacy\Core\Install\Information
+     */
+    public function newInformation()
+    {
+        return new Information($this->dependencyInjector);
+    }
 }
-
-
-$return['result'] = 0;
-echo json_encode($return);
-exit;

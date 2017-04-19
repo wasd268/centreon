@@ -30,19 +30,33 @@
  * do not wish to do so, delete this exception statement from your version.
  * 
  * For more information : contact@centreon.com
- * 
+ *
  */
 
-if (isset($template)) {
-    if (fsockopen("www.centreon.com", 80, $num, $error, 5)) {
-        $pub_content = "http://blog-centreon-wordpress.s3.amazonaws.com/wp-content/uploads/2015/12/custom_view.jpg";
-    } elseif (file_exists("../../img/centreon.png")) {
-        fclose($sock);
-        $pub_content = "../img/centreon.png";
+namespace CentreonLegacy\Core\Install\Step;
+
+class Step8 extends AbstractStep
+{
+    public function getContent()
+    {
+        $installDir = __DIR__ . '/../../../../../www/install';
+        require_once $installDir . '/steps/functions.php';
+        $template = getTemplate($installDir . '/steps/templates');
+
+        $modules = $this->getModules();
+
+        $template->assign('title', _('Modules installation'));
+        $template->assign('step', 8);
+        $template->assign('modules', $modules);
+        return $template->fetch('content.tpl');
     }
-    
-    if (isset($pub_content)) {
-        $template->assign('pub_content', $pub_content);
+
+    public function getModules()
+    {
+        $utilsFactory = new \CentreonLegacy\Core\Utils\Factory($this->dependencyInjector);
+        $utils = $utilsFactory->newUtils();
+        $moduleFactory = new \CentreonLegacy\Core\Module\Factory($this->dependencyInjector, $utils);
+        $module = $moduleFactory->newInformation();
+        return $module->getList();
     }
 }
-

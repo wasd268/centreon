@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2005-2015 Centreon
+ * Copyright 2005-2017 Centreon
  * Centreon is developped by : Julien Mathis and Romain Le Merlus under
  * GPL Licence 2.0.
  *
@@ -33,38 +33,57 @@
  *
  */
 
-session_start();
-require_once '../functions.php';
+require_once dirname(__FILE__) . "/webService.class.php";
 
-if (!isset($_POST['engine'])) {
-    echo 'Could not determine specified engine';
-    exit;
-}
+class CentreonAdministrationModule extends CentreonWebService
+{
+    /**
+     * CentreonAdministrationModule constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
-$lines = getParamLines('../../var/engines', $_POST['engine']);
-$html = "";
-foreach ($lines as $line) {
-    if ($line) {
-        if ($line[0] == '#') {
-            continue;
+    public function postInstall()
+    {
+        if (!isset($this->arguments['name'])) {
+            throw new \Exception('Missing argument : name');
+        } else {
+            $name = $this->arguments['name'];
         }
-        list($key, $label, $required, $paramType, $default) = explode(';', $line);
-        $val = $default;
-        if (isset($_SESSION[$key])) {
-            $val = $_SESSION[$key];
+
+        $factory = new \CentreonLegacy\Core\Module\Factory();
+        $moduleInstaller = $factory->newInstaller($name);
+
+        return $moduleInstaller->install();
+    }
+
+    public function postUpgrade()
+    {
+        if (!isset($this->arguments['name'])) {
+            throw new \Exception('Missing argument : name');
+        } else {
+            $name = $this->arguments['name'];
         }
-        $star = "";
-        if ($required) {
-            $star = "<span style='color:#e00b3d'> *</span>";
+
+        $factory = new \CentreonLegacy\Core\Module\Factory();
+        $moduleUpgrader = $factory->newUpgrader($name);
+
+        return $moduleUpgrader->upgrade();
+    }
+
+    public function postRemove()
+    {
+        if (!isset($this->arguments['name'])) {
+            throw new \Exception('Missing argument : name');
+        } else {
+            $name = $this->arguments['name'];
         }
-        $html .= "
-                    <tr>
-                    <td class='formlabel'>".$label.$star."</td>
-                    <td class='formvalue'>
-                        <input type='text' name='".$key."' value='".$val."' size='30' />
-                        <label class='field_msg'></label>
-                    </td>
-                    </tr>";
+
+        $factory = new \CentreonLegacy\Core\Module\Factory();
+        $moduleRemover = $factory->newRemover($name);
+
+        return $moduleRemover->remove();
     }
 }
-echo $html;

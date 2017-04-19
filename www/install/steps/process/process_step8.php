@@ -36,52 +36,25 @@
 session_start();
 require_once __DIR__ . '/../../../../bootstrap.php';
 
-$requiredParameters = array(
-    'db_configuration',
-    'db_storage',
-    'db_user',
-    'db_password',
-    'db_password_confirm'
-);
-
-$err = array(
-    'required' => array(),
-    'password' => true,
-    'connection' => ''
-);
+$result = array();
 
 $parameters = filter_input_array(INPUT_POST);
-foreach ($parameters as $name => $value) {
-    if (in_array($name, $requiredParameters) && trim($value) == '') {
-        $err['required'][] = $name;
+if (isset($parameters['modules'])) {
+    $utilsFactory = new \CentreonLegacy\Core\Utils\Factory($dependencyInjector);
+    $utils = $utilsFactory->newUtils();
+    $moduleFactory = new \CentreonLegacy\Core\Module\Factory($dependencyInjector, $utils);
+    foreach ($parameters['modules'] as $module) {
+        $installer = $moduleFactory->newInstaller($module);
+        $id = $installer->install();
+        $install = false;
+        if ($id) {
+            $install = true;
+        }
+        $result[] = array(
+            'module' => $module,
+            'install' => $install
+        );
     }
 }
 
-if (!in_array('db_password', $err['required']) && !in_array('db_password_confirm', $err['required']) &&
-    $parameters['db_password'] != $parameters['db_password_confirm']) {
-    $err['password'] = false;
-}
-
-try {
-    if ($parameters['address'] == "") {
-        $parameters['address'] = "localhost";
-    }
-    if ($parameters['port'] == "") {
-        $parameters['port'] = "3306";
-    }
-    $link = new \PDO(
-        'mysql:host=' . $parameters['address'] . ';port=' . $parameters['port'],
-            'root',
-            $parameters['root_password']
-    );
-} catch (\PDOException $e) {
-    $err['connection'] = $e->getMessage();
-}
-$link = null;
-
-if (!count($err['required']) && $err['password'] && trim($err['connection']) == '') {
-    $step = new \CentreonLegacy\Core\Install\Step\Step6($dependencyInjector);
-    $step->setDatabaseConfiguration($parameters);
-}
-
-echo json_encode($err);
+echo json_encode($result);

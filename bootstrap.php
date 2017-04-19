@@ -36,22 +36,18 @@
 // Calling PHP-DI
 use Pimple\Container;
 
-if (!isset($centreon_path)) {
-    die('Centreon path not set.');
-}
-
 set_include_path(implode(PATH_SEPARATOR, array(
-    realpath(_CENTREON_PATH_ . '/www/class'),
-    realpath(_CENTREON_PATH_ . '/www/lib'),
-    get_include_path(),
+    realpath(__DIR__ . '/www/class'),
+    realpath(__DIR__ . '/www/lib'),
+    get_include_path()
 )));
 
 // Centreon Autoload
 spl_autoload_register(function ($sClass) {
     $fileName = $sClass;
     $fileName{0} = strtolower($fileName{0});
-    $fileNameType1 = _CENTREON_PATH_  . "/www/class/" . $fileName . ".class.php";
-    $fileNameType2 = _CENTREON_PATH_  . "/www/class/" . $fileName . ".php";
+    $fileNameType1 = __DIR__  . "/www/class/" . $fileName . ".class.php";
+    $fileNameType2 = __DIR__  . "/www/class/" . $fileName . ".php";
 
     if (file_exists($fileNameType1)) {
         require_once $fileNameType1;
@@ -82,6 +78,17 @@ $dependencyInjector['filesystem'] = function ($c) {
 };
 
 // Define finder
-$dependencyInjector['finder'] = function ($c) {
+$dependencyInjector['finder'] = $dependencyInjector->factory(function ($c) {
     return new \Symfony\Component\Finder\Finder();
-};
+});
+
+// Centreon configuration files
+$configFiles = $dependencyInjector['finder']
+    ->files()
+    ->name('*.config.php')
+    ->depth('== 0')
+    ->in(__DIR__ . '/config');
+foreach ($configFiles as $configFile) {
+    $configFileName = $configFile->getBasename();
+    require_once __DIR__ . '/config/' . $configFileName;
+}

@@ -33,55 +33,59 @@
  *
  */
 
-session_start();
-require_once __DIR__ . '/../../../../bootstrap.php';
+namespace CentreonLegacy\Core\Install\Step;
 
-$requiredParameters = array(
-    'db_configuration',
-    'db_storage',
-    'db_user',
-    'db_password',
-    'db_password_confirm'
-);
+class Step2 extends AbstractStep
+{
+    public function getContent()
+    {
+        $installDir = __DIR__ . '/../../../../../www/install';
+        require_once $installDir . '/steps/functions.php';
+        $template = getTemplate($installDir . '/steps/templates');
 
-$err = array(
-    'required' => array(),
-    'password' => true,
-    'connection' => ''
-);
+        $libs = $this->getPhpLib();
+        $validate = true;
+        if (count($libs['unloaded'])) {
+            $validate = false;
+        }
 
-$parameters = filter_input_array(INPUT_POST);
-foreach ($parameters as $name => $value) {
-    if (in_array($name, $requiredParameters) && trim($value) == '') {
-        $err['required'][] = $name;
+        $template->assign('title', _('Dependency check up'));
+        $template->assign('step', 2);
+        $template->assign('libs', $libs);
+        $template->assign('validate', $validate);
+        return $template->fetch('content.tpl');
     }
-}
 
-if (!in_array('db_password', $err['required']) && !in_array('db_password_confirm', $err['required']) &&
-    $parameters['db_password'] != $parameters['db_password_confirm']) {
-    $err['password'] = false;
-}
+    private function getPhpLib()
+    {
+        $libs = array(
+            'loaded' => array(),
+            'unloaded' => array()
+        );
 
-try {
-    if ($parameters['address'] == "") {
-        $parameters['address'] = "localhost";
+        $requiredLib = explode(
+            "\n",
+            file_get_contents(__DIR__ . '/../../../../../www/install/var/phplib')
+        );
+        foreach ($requiredLib as $line) {
+            if (!$line) {
+                continue;
+            }
+
+            list($name, $lib) = explode(":", $line);
+
+            if (extension_loaded($lib)) {
+                $libs['loaded'][$name] = $lib . '.so';
+            } else {
+                $libs['unloaded'][$name] = $lib . '.so';
+            }
+        }
+
+        if (!ini_get('date.timezone')) {
+            $libs['unloaded']['Timezone'] = _("Set the default timezone in php.ini file");
+        }
+
+        return $libs;
     }
-    if ($parameters['port'] == "") {
-        $parameters['port'] = "3306";
-    }
-    $link = new \PDO(
-        'mysql:host=' . $parameters['address'] . ';port=' . $parameters['port'],
-            'root',
-            $parameters['root_password']
-    );
-} catch (\PDOException $e) {
-    $err['connection'] = $e->getMessage();
-}
-$link = null;
 
-if (!count($err['required']) && $err['password'] && trim($err['connection']) == '') {
-    $step = new \CentreonLegacy\Core\Install\Step\Step6($dependencyInjector);
-    $step->setDatabaseConfiguration($parameters);
 }
-
-echo json_encode($err);

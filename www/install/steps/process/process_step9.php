@@ -30,35 +30,34 @@
  * do not wish to do so, delete this exception statement from your version.
  * 
  * For more information : contact@centreon.com
- * 
+ *
  */
 
 session_start();
-DEFINE('STEP_NUMBER', 8);
-$_SESSION['step'] = STEP_NUMBER;
+require_once __DIR__ . '/../../../../bootstrap.php';
+$step = new \CentreonLegacy\Core\Install\Step\Step9($dependencyInjector);
+$version = $step->getVersion();
 
-require_once 'functions.php';
-$template = getTemplate('./templates');
+$message = '';
 
-$title = _('Installation finished');
-
-$contents = '<div>'._('Congratulations, you have successfully installed Centreon!').'</div>';
-
-$centreon_path = realpath(dirname(__FILE__) . '/../../../');
-
-if (false === is_dir($centreon_path . '/installDir')) {
-    $contents .= '<br>Warning : The installation directory cannot be move. Please create the directory ' . $centreon_path . '/installDir and give it the rigths to apache user to write.';
-} else {
-    $name = 'install-' . $_SESSION['version'] . '-' . date('Ymd_His');
-    @rename(str_replace('steps', '', getcwd()), $centreon_path . '/installDir/' . $name);
+try {
+    $finalBackupDir = $backupDir . '/install-' . $version . '-' . date('Ymd_His');
+    $backupDir = realpath(__DIR__ . '/../../../../installDir/')
+        . '/install-' . $version . '-' . date('Ymd_His');
+    $installDir =  realpath(__DIR__ . '/../..');
+    $dependencyInjector['filesystem']->rename($installDir, $backupDir);
+    if ($dependencyInjector['filesystem']->exists($installDir)) {
+        throw new \Exception('Cannot move directory from ' . $installDir . ' to ' . $backupDir);
+    }
+    $dependencyInjector['filesystem']->remove($backupDir . '/tmp/admin.json');
+    $dependencyInjector['filesystem']->remove($backupDir . '/tmp/database.json');
+    $result = true;
+} catch (\Exception $e) {
+    $result = false;
+    $message = $e->getMessage();
 }
 
-session_destroy();
-require_once ("process/advertising.php");
-$template->assign('step', STEP_NUMBER);
-$template->assign('title', $title);
-$template->assign('content', $contents);
-$template->assign('finish', 1);
-$template->assign('blockPreview', 1);
-$template->display('content.tpl');
-
+echo json_encode(array(
+    'result' => $result,
+    'message' => $message
+));

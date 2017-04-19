@@ -33,55 +33,27 @@
  *
  */
 
-session_start();
-require_once __DIR__ . '/../../../../bootstrap.php';
+namespace CentreonLegacy\Core\Install\Step;
 
-$requiredParameters = array(
-    'db_configuration',
-    'db_storage',
-    'db_user',
-    'db_password',
-    'db_password_confirm'
-);
+class Step5 extends AbstractStep
+{
+    public function getContent()
+    {
+        $installDir = __DIR__ . '/../../../../../www/install';
+        require_once $installDir . '/steps/functions.php';
+        $template = getTemplate($installDir . '/steps/templates');
 
-$err = array(
-    'required' => array(),
-    'password' => true,
-    'connection' => ''
-);
+        $parameters = $this->getAdminConfiguration();
 
-$parameters = filter_input_array(INPUT_POST);
-foreach ($parameters as $name => $value) {
-    if (in_array($name, $requiredParameters) && trim($value) == '') {
-        $err['required'][] = $name;
+        $template->assign('title', _('Admin information'));
+        $template->assign('step', 5);
+        $template->assign('parameters', $parameters);
+        return $template->fetch('content.tpl');
+    }
+
+    public function setAdminConfiguration($parameters)
+    {
+        $configurationFile = __DIR__ . "/../../../../../www/install/tmp/admin.json";
+        file_put_contents($configurationFile, json_encode($parameters));
     }
 }
-
-if (!in_array('db_password', $err['required']) && !in_array('db_password_confirm', $err['required']) &&
-    $parameters['db_password'] != $parameters['db_password_confirm']) {
-    $err['password'] = false;
-}
-
-try {
-    if ($parameters['address'] == "") {
-        $parameters['address'] = "localhost";
-    }
-    if ($parameters['port'] == "") {
-        $parameters['port'] = "3306";
-    }
-    $link = new \PDO(
-        'mysql:host=' . $parameters['address'] . ';port=' . $parameters['port'],
-            'root',
-            $parameters['root_password']
-    );
-} catch (\PDOException $e) {
-    $err['connection'] = $e->getMessage();
-}
-$link = null;
-
-if (!count($err['required']) && $err['password'] && trim($err['connection']) == '') {
-    $step = new \CentreonLegacy\Core\Install\Step\Step6($dependencyInjector);
-    $step->setDatabaseConfiguration($parameters);
-}
-
-echo json_encode($err);

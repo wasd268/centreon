@@ -133,8 +133,8 @@ class CentreonXMLBGRequest {
         /*
          * Enable Database Connexions
          */
-        $this->DB = $this->dependencyInjector['configuration_db'];
-        $this->DBC = $this->dependencyInjector['realtime_db'];
+        $this->DB = $dependencyInjector['configuration_db'];
+        $this->DBC = $dependencyInjector['realtime_db'];
 
         /*
          * Init Objects

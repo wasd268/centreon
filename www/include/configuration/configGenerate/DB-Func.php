@@ -71,9 +71,6 @@ function getMyHostTemplateCriticality($host_id)
  */
 function intCmdParam($DB, $pollerId)
 {
-
-
-
     $cache = array('tpl' => array(), 'svc' => array());
     
     $commands = array();
@@ -832,6 +829,53 @@ function getLocalhostId()
     }
     $row = $res->fetchRow();
     return $row['id'];
+}
+
+/**
+ * getListIndexData
+ *
+ * @return array
+ * @throws Exception
+ */
+function getListIndexData()
+{
+    global $pearDB, $pearDBO;
+var_dump($pearDBO);
+    $queryGetRelation = "SELECT id, host_id, service_id
+	    	                 FROM index_data
+                             ORDER BY host_id";
+    try {
+        $res = $pearDBO->query($queryGetRelation);
+    } catch (\PDOException $e) {
+        throw new Exception('Bad query');
+    }
+    $listRelation = array();
+    while ($row = $res->fetchRow()) {
+        $id = $row['host_id'].';'.$row['service_id'];
+        $listRelation[$id] = true;
+    }
+    return $listRelation;
+}
+
+function getIndexToDelete($infos)
+{
+    if ($infos['status'] === false) {
+        return true;
+    }
+    return false;
+}
+
+function getIndexToKeep($infos)
+{
+    if ($infos['status'] === true) {
+        return true;
+    }
+    return false;
+}
+
+function getIndexesId($infos)
+{
+    return $infos['id'];
 }
 
 function getChildren($infos)
