@@ -33,26 +33,19 @@
  *
  */
 
-namespace CentreonLegacy\Configuration\Resource;
+namespace CentreonLegacy\Configuration\Internal\Resource;
 
 use \Pimple\Container;
 
-class BaseResource implements ResourceInterface
+class Poller extends BaseResource
 {
     /**
-     * @var \Pimple\Container
-     */
-    protected $dependencyInjector;
-
-    /**
-     * BaseResource constructor.
+     * Poller constructor.
      * @param \Pimple\Container $dependencyInjector
      */
     public function __construct(\Pimple\Container $dependencyInjector)
     {
-        $this->dependencyInjector = $dependencyInjector;
+        parent::__construct($dependencyInjector);
     }
-
-
 
 }

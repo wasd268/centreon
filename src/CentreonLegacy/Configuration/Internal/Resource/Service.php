@@ -33,10 +33,10 @@
  *
  */
 
-namespace CentreonLegacy\Configuration\Resource;
+namespace CentreonLegacy\Configuration\Internal\Resource;
 
 use \Pimple\Container;
-use \CentreonLegacy\Configuration\Resource\Poller;
+use \CentreonLegacy\Configuration\Internal\Resource\Poller;
 
 class Service extends BaseResource
 {

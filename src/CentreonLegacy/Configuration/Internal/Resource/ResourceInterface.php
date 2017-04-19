@@ -33,7 +33,7 @@
  *
  */
 
-namespace CentreonLegacy\Configuration\Resource;
+namespace CentreonLegacy\Configuration\Internal\Resource;
 
 interface ResourceInterface
 {
