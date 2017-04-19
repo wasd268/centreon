@@ -293,7 +293,7 @@ class Service extends BaseResource
          */
         if ($row['service_register'] == 1) {
             if (preg_match('/\$SERVICEDESC\$/', $string)) {
-                $string = str_replace("\$SERVICEDESC\$", $this->getServiceDesc($svcId), $string);
+                $string = str_replace("\$SERVICEDESC\$", $this->getDescription($svcId), $string);
             }
             if (!is_null($instanceId) && preg_match("\$INSTANCENAME\$", $string)) {
                 $string = str_replace("\$INSTANCENAME\$", $this->pollerObj->getParam($instanceId, 'name'), $string);
@@ -407,7 +407,7 @@ class Service extends BaseResource
         $cnt = 0;
         $macros = $macroInput;
         $macroValues = $macroValue;
-        $this->hasMacroFromServiceChanged(
+        $this->setMacroValues(
             $this->dependencyInjector['configuration_db'],
             $serviceId,
             $macros,

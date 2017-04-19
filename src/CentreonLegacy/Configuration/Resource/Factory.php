@@ -69,5 +69,12 @@ class Factory
         return new Service($this->dependencyInjector);
     }
 
+    /**
+     * @return Service
+     */
+    public function newHost()
+    {
+        return new Host($this->dependencyInjector);
+    }
 }
 
