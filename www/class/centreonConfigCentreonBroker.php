@@ -814,12 +814,12 @@ class CentreonConfigCentreonBroker
      */
     public function getForms($config_id, $tag, $page, $tpl)
     {
-        $query = "SELECT config_key, config_value, config_group_id, grp_level, parent_grp_id, fieldIndex
-            FROM cfg_centreonbroker_info
-        WHERE config_id = %d
-            AND config_group = '%s'
-            AND subgrp_id IS NULL
-            ORDER BY config_group_id";
+        $query = "SELECT config_key, config_value, config_group_id, grp_level, parent_grp_id, fieldIndex " .
+            "FROM cfg_centreonbroker_info " .
+            "WHERE config_id = %d " .
+            "AND config_group = '%s' " .
+            "AND subgrp_id IS NULL " .
+            "ORDER BY config_group_id";
         try {
             $res = $this->db->query(sprintf($query, $config_id, $tag));
         } catch (\PDOException $e) {
@@ -828,57 +828,68 @@ class CentreonConfigCentreonBroker
         $formsInfos = array();
         $arrayMultipleValues = array();
         while ($row = $res->fetchRow()) {
-            $fieldname = $tag . '[' . $row['config_group_id'] . '][' .
-                $this->getConfigFieldName($config_id, $tag, $row) . ']';
-        /* Multi value for a multiselect */
-            if (isset($row['fieldIndex']) && !is_null($row['fieldIndex']) && $row['fieldIndex'] != "") {
-                $fieldname = $tag . '[' . $row['config_group_id'] . '][' .
-                    $this->getConfigFieldName($config_id, $tag, $row) . '_#index#]';
-                $arrayMultipleValues[$fieldname][] = $row['config_value'];
+            $configFieldName = $this->getConfigFieldName($config_id, $tag, $row);
+            $fieldname = $tag . '[' . $row['config_group_id'] . '][' . $configFieldName . ']';
+
+            /*
+            if (isset($formsInfos[$row['config_group_id']]['defaults'][$fieldname])) {
+                if (!is_array($formsInfos[$row['config_group_id']]['defaults'][$fieldname])) {
+                    $formsInfos[$row['config_group_id']]['defaults'][$fieldname] = array(
+                        $formsInfos[$row['config_group_id']]['defaults'][$fieldname]
+                    );
+                }
+                    $formsInfos[$row['config_group_id']]['defaults'][$fieldname][] = $row['config_value'];
             } else {
-                if (isset($formsInfos[$row['config_group_id']]['defaults'][$fieldname])) {
-                    if (!is_array($formsInfos[$row['config_group_id']]['defaults'][$fieldname])) {
-                        $formsInfos[$row['config_group_id']]['defaults'][$fieldname] = array(
-                            $formsInfos[$row['config_group_id']]['defaults'][$fieldname]
-                        );
-                    }
-                        $formsInfos[$row['config_group_id']]['defaults'][$fieldname][] = $row['config_value'];
-                } else {
-                        $formsInfos[$row['config_group_id']]['defaults'][$fieldname] = $row['config_value'];
-                        $formsInfos[$row['config_group_id']]['defaults'][$fieldname . '[' . $row['config_key'] . ']'] =
-                            $row['config_value']; // Radio button
-                }
-                if ($row['config_key'] == 'blockId') {
-                    $formsInfos[$row['config_group_id']]['blockId'] = $row['config_value'];
-                }
+                    $formsInfos[$row['config_group_id']]['defaults'][$fieldname] = $row['config_value'];
+                    $formsInfos[$row['config_group_id']]['defaults'][$fieldname . '[' . $row['config_key'] . ']'] =
+                        $row['config_value']; // Radio button
+            }
+            */
+            if ($row['config_key'] == 'blockId') {
+                $formsInfos[$row['config_group_id']]['blockId'] = $row['config_value'];
+            } elseif (isset($row['fieldIndex']) && !is_null($row['fieldIndex']) && $row['fieldIndex'] != "") {
+                $fieldname = $tag . '[' . $row['config_group_id'] . '][' . $configFieldName . '_#index#]';
+                $arrayMultipleValues[$fieldname][$row['fieldIndex']] = $row['config_value'];
+                //$formsInfos[$row['config_group_id']]['defaults'][$fieldname][$row['fieldIndex']] = $row['config_value'];
+            } else {
+                $formsInfos[$row['config_group_id']]['defaults'][$fieldname] = $row['config_value'];
             }
         }
+        echo '<pre>';
+        //var_dump($formsInfos);
+        echo '<pre>';
         $forms = array();
         $isMultiple = false;
+        //var_dump($arrayMultipleValues);
 
-        foreach (array_keys($formsInfos) as $key) {
+        foreach ($formsInfos as $key => $value) {
             $qf = $this->quickFormById($formsInfos[$key]['blockId'], $page, $key, $config_id);
             /*
              * Replace loaded configuration with defaults external values
              */
 
-            list($tagId , $typeId) = explode('_', $formsInfos[$key]['blockId']);
+            list($tagId , $typeId) = explode('_', $value['blockId']);
             $tag = $this->getTagName($tagId);
             $fields = $this->getBlockInfos($typeId);
+            //var_dump($fields);
+
 
             foreach ($fields as $field) {
                 $elementName = $this->getElementName($tag, $key, $field, $isMultiple);
+                //var_dump($elementName);
                 if (!is_null($field['value']) && $field['value'] != false) {
-                    unset($formsInfos[$key]['defaults'][$elementName]); // = $this->getInfoDb($field['value']);
+                    unset($formsInfos[$key]['defaults'][$elementName]);
                 }
                 if (isset($arrayMultipleValues[$elementName])) {
+                    //var_dump('okkk');
                     if ($isMultiple && $field['group'] !== '') {
                         $parentGroup = $this->getParentGroups($field['group'], $isMultiple);
-                        $parentGroup = $parentGroup."_".$key;
+                        $parentGroup = $parentGroup . "_" . $key;
                         $arrayMultiple[$parentGroup][$elementName] = $arrayMultipleValues[$elementName];
                     }
                 }
             }
+            //var_dump($arrayMultiple);
             $qf->setDefaults($formsInfos[$key]['defaults']);
             $renderer = new HTML_QuickForm_Renderer_ArraySmarty($tpl);
             $renderer->setRequiredTemplate('{$label}&nbsp;<font color="red" size="1">*</font>');
@@ -897,6 +908,7 @@ class CentreonConfigCentreonBroker
                 }
             }
         }
+        var_dump($this->arrayMultiple);
         $this->generateCdata();
 
         return $forms;

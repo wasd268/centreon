@@ -167,6 +167,9 @@ if (isset($_GET["o"]) && $_GET["o"] == 'a') {
         $nbTabs = count($tabs);
         for ($i = 0; $i < $nbTabs; $i++) {
             $tabs[$i]['forms'] = $cbObj->getForms($id, $tabs[$i]['id'], $p, $tpl);
+            //echo "<pre>";
+            //var_dump($tabs[$i]['forms']);
+            //echo "</pre>";
             $tabs[$i]['helps'] = $cbObj->getHelps($id, $tabs[$i]['id']);
             $tabs[$i]['nb'] = count($tabs[$i]['forms']);
         }
