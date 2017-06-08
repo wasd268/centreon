@@ -35,10 +35,11 @@ first.
 
 ## Coding Style Guide ##
 
+### PHP ###
+
 For these projects, Centreon work on follow the [PSR-2](http://www.php-fig.org/psr/psr-2/) coding style guidelines.
 
-### Summary ### 
-**Frequently used**
+**Summary**
 
 * Code must use an indent of 4 spaces, and must not use tabs for indenting.
 * There must not be trailing whitespace at the end of non-blank lines.
@@ -115,9 +116,9 @@ public function longLine(
 }
 ```
 
-### Check your code ###
+**Check your code**
 
-[PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) is available with composer:
+To check your code, you can use [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer), it is available with composer:
 ```bash
 $ php composer.phar require --dev \ squizlabs/php_codesniffer:"*@stable"
 ```
@@ -126,7 +127,47 @@ To validate the code with the [PSR-2](http://www.php-fig.org/psr/psr-2/) standar
 $ ./bin/phpcs -p --standard=PSR2 src/centreon/myFile
 ```
 
+### HTML ###
 
+All tags and attributes are lowercase.
+
+### CSS ###
+
+Definition ideally as dashed name:
+    class: .some-class-name
+    id: #some-id-to-an-element
+
+Both with lowercase characters (although classes are not case-sensitive, id's are!), the separator is minus [-]. You can use underscore [_] if it makes the separation of the identifier and the record id easier. E.g. my-id_33. It will become necessary to do so if you use UUIDs (which contain minus chars).
+
+```css
+span.success {
+    color: green;
+}
+```
+### JS ###
+
+* Method and variable names must be in camelCase.
+* Arrays that span across multiple lines can have a trailing comma to make sure that adding new rows does not change the previous row, as well.
+
+```js
+firstName = "John";
+
+var myTab = [];
+var myTab = new Array();
+
+myTab = [
+	'first',
+	'second'
+];
+
+var tabAsso={
+    "val1":10,
+    "val2":55,
+    "val3":30
+};
+
+
+```
 
 
 ## Authors ##
