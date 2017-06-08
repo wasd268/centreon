@@ -117,11 +117,11 @@ public function longLine(
 
 ### Check your code ###
 
-PHP_CodeSniffer is available with composer:
+[PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) is available with composer:
 ```bash
 $ php composer.phar require --dev \ squizlabs/php_codesniffer:"*@stable"
 ```
-To validate the code with the PSR-2 standard:
+To validate the code with the [PSR-2](http://www.php-fig.org/psr/psr-2/) standard:
 ```bash
 $ ./bin/phpcs -p --standard=PSR2 src/centreon/myFile
 ```
