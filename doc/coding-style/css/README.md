@@ -1,8 +1,8 @@
 # Coding Style Guide
 ## CSS
-### OOCSS and BEM
+### OOCSS
 
-We encourage some combination of [OOCSS](http://oocss.org/) and [BEM](http://getbem.com/introduction/) for these reasons:
+We encourage you to make use of [OOCSS](http://oocss.org/) for these reasons:
 
 * It helps create clear, strict relationships between CSS and HTML
 * It helps us create reusable, composable components
