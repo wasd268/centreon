@@ -16,14 +16,14 @@
 ```html
 //bad
 <section>
-  <p>This is a paragraph.
-  <p>This is a paragraph.
+  <p>First paragraph.
+  <p>Second paragraph.
 </section>
 
 //good
 <section>
-  <p>This is a paragraph.</p>
-  <p>This is a paragraph.</p>
+  <p>First paragraph.</p>
+  <p>Second paragraph.</p>
 </section>
 ```
 * Close empty HTML elements.
@@ -57,36 +57,48 @@
     * Do not add blank lines without a reason.
     * For readability, add blank lines to separate large or logical code blocks.
     * For readability, add 4 spaces of indentation. Do not use the tab key.
+    * For readability, if the text of the block is in a straight line, the indentation is unnecessary
     * For readability, indent block elements, inline elements indentation is unnecessary
 ```html
 //bad
 <body>
 
-    <h1></h1>
+    <h1>Cyprum itidem insulam procul</h1>
     <div>
     
-    <h2></h2>
-    <div></div>
+    <h2>Paphius quin etiam</h2>
+    <div>Cyprus ut nullius externi indigens adminiculi indigenis viribus a fundamento ipso carinae ad supremos
+     usque carbasos aedificet onerariam navem omnibusque armamentis instructam mari committat.</div>
     </div>
    
-    <p></p>
+    <p>Maximino sunt interfecti. pari sorte etiam procurator monetae extinctus est</p>
+    <p>Sericum enim et Asbolium supra dictos, quoniam cum hortaretur passim 
+    nominare, quos vellent, adiecta religione firmarat, nullum igni vel 
+    ferro se puniri iussurum, plumbi validis ictibus interemit. </p>
 
 </body>
 
 //good
 <body>
-    <h1></h1>
+    <h1>Cyprum itidem insulam procul</h1>
     <div>
-        <h2></h2>
+        <h2>Paphius quin etiam</h2>
         <div>
+        Cyprus ut nullius externi indigens adminiculi indigenis viribus
+        a fundamento ipso carinae ad supremos usque carbasos aedificet onerariam 
+        navem omnibusque armamentis instructam mari committat.
         </div>
     </div>
+    <p>Maximino sunt interfecti. pari sorte etiam procurator monetae extinctus est</p>
     <p>
+    Sericum enim et Asbolium supra dictos, quoniam cum hortaretur passim 
+    nominare, quos vellent, adiecta religione firmarat, nullum igni vel 
+    ferro se puniri iussurum, plumbi validis ictibus interemit. 
     </p>
 </body>
 ```
-* Do not use '&nbsp;' and <br />.
-* Do not use old HTML tags (<color>, <front> ...), make a css.
+* Do not use '```&nbsp;```' and ```<br /> ```.
+* Do not use old HTML tags (```<color>```, ```<front>```, ...), make a css.
 
 **[⬆ back to top](#coding-style-guide)**
 
