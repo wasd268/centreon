@@ -129,6 +129,6 @@ To validate the code with the [PSR-2](http://www.php-fig.org/psr/psr-2/) standar
 $ ./bin/phpcs -p --standard=PSR2 src/centreon/myFile
 ```
 
-**[⬆ back to top](#Coding-Style-Guide)**
+**[⬆ back to top](#coding-style-guide)**
 
 **[← back to summary](https://github.com/centreon/centreon)**

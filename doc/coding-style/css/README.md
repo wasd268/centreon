@@ -87,6 +87,6 @@ To set a css for a module, use underscore [_] to make the separation of the modu
 }
 ```
 
-**[⬆ back to top](#Coding-Style-Guide)**
+**[⬆ back to top](#coding-style-guide)**
 
 **[← back to summary](https://github.com/centreon/centreon)**
