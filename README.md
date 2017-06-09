@@ -38,9 +38,9 @@ first.
 * [PHP](https://github.com/centreon/centreon/tree/style/doc/coding-style/php)
 
 **frontend** 
-* [css](https://github.com/centreon/centreon/tree/style/doc/coding-style/css)
-* [html](https://github.com/centreon/centreon/tree/style/doc/coding-style/html)
-* [js](https://github.com/centreon/centreon/tree/style/doc/coding-style/js)
+* [CSS](https://github.com/centreon/centreon/tree/style/doc/coding-style/css)
+* [HTML](https://github.com/centreon/centreon/tree/style/doc/coding-style/html)
+* [JS](https://github.com/centreon/centreon/tree/style/doc/coding-style/js)
 
 ## Authors
 
