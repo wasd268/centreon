@@ -10,12 +10,15 @@ var firstName = "John";
 ```js
 var myTab = [];
 
+var shortTab = ['first', 'second'];
+
 var longTab = [
-	'first',
-	'second'
+    'first',
+	'second',
+	'...'
 ];
 
-var tabAsso={
+var assoTab = {
     "val1":10,
     "val2":55,
     "val3":30
@@ -36,14 +39,15 @@ if (time < 10) {
 var x = y + z;
 var values = [1, 2, 3]; 
 
+var i;
 for (i = 0; i < 5; i++) {
     x += i;
 }
 ```
-* Use 4 spaces for indentation of code blocks.
+* Prefer 4 spaces for indentation of code blocks.
 ```js
-function toCelsius(fahrenheit) {
-    return (5 / 9) * (fahrenheit - 32);
+function hello(world) {
+    return world;
 }
 ```
 * Line Length < 80
@@ -70,9 +74,10 @@ var firstName = "",
 ```
 * Reduce Activity in Loops
 ```js
-// Declare and initiate at the beginning
-for (i = 0; i < arr.length; i++) {}
-//became
+// bad
+for (var i = 0; i < arr.length; i++) {}
+
+//good
 var i;
 var l = arr.length;
 for (i = 0; i < l; i++) {}
@@ -80,9 +85,14 @@ for (i = 0; i < l; i++) {}
 * Avoid Unnecessary Variables
 ```js
 // Declare and initiate at the beginning
+//bad
 var fullName = firstName + " " + lastName;
 document.getElementById("name").innerHTML = fullName;
-//became
+
+//good
 document.getElementById("name").innerHTML = firstName + " " + lastName 
 ```
 
+**[⬆ back to top](#Coding Style Guide)**
+
+**[← back to summary](https://github.com/centreon/centreon)**
