@@ -9,7 +9,23 @@ For these projects, Centreon work on follow the [PSR-2](http://www.php-fig.org/p
 * Code must use an indent of 4 spaces, and must not use tabs for indenting.
 * There must not be trailing whitespace at the end of non-blank lines.
 * The PHP constants true, false, and null must be in lower case.
+```php
+//bad
+public function sampleMethod ($a, $b = NULL) {}
+//good
+public function sampleMethod ($a, $b = null) {}
+```
 * For control structures( if/for/while…), the placement of parentheses, spaces, and braces; and that else and elseif are on the same line as the closing brace from the earlier body.-b 
+```php
+//bad
+if($a===$b){
+    echo 'equal';
+}
+//good
+if ($a === $b) {
+    echo 'equal';
+}
+```
 * The keyword elseif should be used instead of else if so that all control keywords look like single words.
 
 ```php
@@ -21,7 +37,7 @@ use OtherVendor\OtherPackage\BazClass;
 
 class Foo extends Bar implements FooInterface
 {
-    public function sampleMethod($a, $b = null)
+    public function sampleMethod ($a, $b = null)
     {
         if ($a === $b) {
             bar();
@@ -45,13 +61,9 @@ class Foo extends Bar implements FooInterface
 }
 
 ```
-
 * The limit on line length must be 120 characters.
-* Method and variable names must be in camelCase.
-* For the casting, please use (int)$var instead of intval($var) method.
-
 ```php
-public function longLine(
+public function longLine (
     $longArgument,
     $longerArgument,
     $muchLongerArgument
@@ -79,7 +91,33 @@ public function longLine(
     }
 }
 ```
+* Method and variable names must be in camelCase.
 
+```php
+//bad
+$compound_name = 'compound';
+$compound-name = 'compound';
+
+//good
+$compoundName = 'compound';
+```
+* For the casting, please use (int)$var instead of intval($var) method.
+
+```php
+$b = true;
+$i = "1";
+$f = "1.5";
+
+//bad
+boolval($b);
+intval($i);
+floatval($f);
+
+//good
+(bool)$b;
+(int)$i;
+(float)$f;
+```
 ### Check your code
 
 To check your code, you can use [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer), it is available with composer:
