@@ -1,11 +1,5 @@
 # Coding Style Guide
-
-## HTML
-
-All tags and attributes are lowercase.
-
 ## CSS
-
 ### OOCSS and BEM
 
 We encourage some combination of OOCSS and BEM for these reasons:
@@ -18,29 +12,16 @@ We encourage some combination of OOCSS and BEM for these reasons:
 OOCSS, or “Object Oriented CSS”, is an approach for writing CSS that encourages you to think about your stylesheets as a collection of “objects”: reusable, repeatable snippets that can be used independently throughout a website.
 BEM, or “Block-Element-Modifier”, is a naming convention for classes in HTML and CSS. It was originally developed by Yandex with large codebases and scalability in mind, and can serve as a solid set of guidelines for implementing OOCSS.
 
-```jsx
-// ListingCard.jsx
-function ListingCard() {
-  return (
-    <article class="ListingCard ListingCard--featured">
-
-      <h1 class="ListingCard__title">Adorable 2BR in the sunny Mission</h1>
-
-      <div class="ListingCard__content">
+```html
+<div class="centreon centreon-block">
+    <h1 class="centreon-title">Adorable 2BR in the sunny Mission</h1>
+    <div class="centreon-body_1">
         <p>Vestibulum id ligula porta felis euismod semper.</p>
-      </div>
-
-    </article>
-  );
-}
-```
-
-```css
-/* ListingCard.css */
-.ListingCard { }
-.ListingCard--featured { }
-.ListingCard__title { }
-.ListingCard__content { }
+    </div>
+    <div class="centreon-body_2">
+        <p>Vestibulum id ligula porta felis euismod semper.</p>
+    </div>
+</div>
 ```
 * .ListingCard is the “block” and represents the higher-level component
 * .ListingCard__title is an “element” and represents a descendant of .ListingCard that helps compose the block as a whole.
@@ -48,7 +29,7 @@ function ListingCard() {
 
 ### Formatting
 
-* Use soft tabs (2 spaces) for indentation
+* Use 4 spaces for indentation
 * Prefer dashes over camelCasing in class names.
     * class: .some-class-name
     * id: #some-id-to-an-element
@@ -106,6 +87,6 @@ To set a css for a module, use underscore [_] to make the separation of the modu
 }
 ```
 
-**[⬆ back to top](#Coding Style Guide)**
+**[⬆ back to top](#Coding-Style-Guide)**
 
 **[← back to summary](https://github.com/centreon/centreon)**

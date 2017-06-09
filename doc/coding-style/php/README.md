@@ -61,7 +61,7 @@ class Foo extends Bar implements FooInterface
 }
 
 ```
-* The limit on line length must be 120 characters.
+* The limit on line length must be 120 characters, 80 is better.
 ```php
 public function longLine (
     $longArgument,
@@ -129,6 +129,6 @@ To validate the code with the [PSR-2](http://www.php-fig.org/psr/psr-2/) standar
 $ ./bin/phpcs -p --standard=PSR2 src/centreon/myFile
 ```
 
-**[⬆ back to top](#Coding Style Guide)**
+**[⬆ back to top](#Coding-Style-Guide)**
 
 **[← back to summary](https://github.com/centreon/centreon)**

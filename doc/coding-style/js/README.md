@@ -50,7 +50,7 @@ function hello(world) {
     return world;
 }
 ```
-* Line Length < 80
+* The limit on line length must be 120 characters, 80 is better.
 ```js
 document.getElementById("world").innerHTML =
     "Hello World.";
@@ -93,6 +93,6 @@ document.getElementById("name").innerHTML = fullName;
 document.getElementById("name").innerHTML = firstName + " " + lastName 
 ```
 
-**[⬆ back to top](#Coding Style Guide)**
+**[⬆ back to top](#Coding-Style-Guide)**
 
 **[← back to summary](https://github.com/centreon/centreon)**
