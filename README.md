@@ -1,6 +1,6 @@
-# Centreon - IT and Application monitoring software #
+#Centreon - IT and Application monitoring software
 
-## Introduction ##
+##Introduction
 
 Centreon is one of the most flexible and powerful monitoring softwares
 on the market; it is absolutely free and Open Souce (released under GNU
@@ -17,7 +17,7 @@ operational.
 * the [forum](http://forum.centreon.com)
 * the [download center](https://download.centreon.com)
 
-## Download / Install ##
+##Download / Install
 
 The fastest way to install up-to-date software from Centreon is to use
 our [Centreon Enterprise Server](https://www.centreon.com/en/products/centreon-enterprise-server/)
@@ -26,16 +26,16 @@ Linux distribution, which comes with our software already packaged.
 Latest source releases can be retrieved from [Centreon download center](https://download.centreon.com).
 They can be installed by following the [online installation guide](https://documentation.centreon.com/docs/centreon/en/latest/installation/from_sources.html).
 
-## Bug report / Feature request ##
+##Bug report / Feature request
 
 Bug reports and feature requests are more than welcome. However if you
 wish to open a new issue, please read [this page](project/issues.md)
 first.
 
 
-## Coding Style Guide ##
+##Coding Style Guide
 
-### PHP ###
+###PHP
 
 For these projects, Centreon work on follow the [PSR-2](http://www.php-fig.org/psr/psr-2/) coding style guidelines.
 
@@ -116,7 +116,7 @@ public function longLine(
 }
 ```
 
-**Check your code**
+####Check your code
 
 To check your code, you can use [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer), it is available with composer:
 ```bash
@@ -127,11 +127,11 @@ To validate the code with the [PSR-2](http://www.php-fig.org/psr/psr-2/) standar
 $ ./bin/phpcs -p --standard=PSR2 src/centreon/myFile
 ```
 
-### HTML ###
+###HTML
 
 All tags and attributes are lowercase.
 
-### CSS ###
+###CSS
 
 Definition ideally as dashed name:
     class: .some-class-name
@@ -144,7 +144,7 @@ span.success {
     color: green;
 }
 ```
-### JS ###
+###JS
 
 * Method and variable names must be in camelCase.
 ```js
@@ -233,13 +233,13 @@ document.getElementById("name").innerHTML = firstName + " " + lastName
 
 
 
-## Authors ##
+##Authors
 
-### Project leaders ###
+###Project leaders
 * Julien Mathis
 * Romain Le Merlus
 
-### Dev team ###
+###Dev team
 * Lionel Assepo
 * Maximilien Bersoult
 * Kevin Duret
