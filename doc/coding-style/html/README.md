@@ -85,6 +85,8 @@
     </p>
 </body>
 ```
+* Do not use '&nbsp;' and <br />.
+* Do not use old HTML tags (<color>, <front> ...), make a css.
 
 **[⬆ back to top](#coding-style-guide)**
 
