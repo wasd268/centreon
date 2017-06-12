@@ -72,7 +72,7 @@ public function longLine (
     $muchLongerArgument
 ) {
        
-    $longArray =array(
+    $longArray = array(
         array(
             0,
             1,
