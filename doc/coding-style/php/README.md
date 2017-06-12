@@ -13,7 +13,10 @@ For these projects, Centreon work on follow the [PSR-2](http://www.php-fig.org/p
 //bad
 public function sampleMethod ($a, $b = NULL) {}
 //good
-public function sampleMethod ($a, $b = null) {}
+public function sampleMethod ($a, $b = null)
+{
+    // method body
+}
 ```
 * For control structures( if/for/while…), the placement of parentheses, spaces, and braces; and that else and elseif are on the same line as the closing brace from the earlier body.-b 
 ```php
