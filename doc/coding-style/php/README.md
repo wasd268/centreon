@@ -94,7 +94,7 @@ public function longLine (
     }
 }
 ```
-* Method and variable names must be in camelCase.
+* Method and variable names must be in lowerCamelCase.
 
 ```php
 //bad
