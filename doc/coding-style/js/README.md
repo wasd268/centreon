@@ -2,7 +2,7 @@
 
 ## JS
 
-* Method and variable names must be in camelCase.
+* Method and variable names must be in lowerCamelCase.
 ```js
 var firstName = "John";
 ```
